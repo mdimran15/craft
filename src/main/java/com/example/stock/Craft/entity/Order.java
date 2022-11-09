@@ -2,24 +2,25 @@ package com.example.stock.Craft.entity;
 
 
 import com.example.stock.Craft.dto.OrderType;
-import com.sun.istack.internal.NotNull;
+//import com.sun.istack.internal.NotNull;
 
 import java.math.BigDecimal;
 import java.util.Objects;
 
+
 public class Order {
 
     //@Column
-    @NotNull
+    //@NotNull
     private String orderId;
-    @NotNull
+    //@NotNull
     private Long createDate;
-    @NotNull
+    //NotNull
     private String stockName;
     private OrderType orderType;
-    @NotNull
+    //@NotNull
     private int quantity;
-    @NotNull
+    //@NotNull
     private BigDecimal price;
 
     private boolean orderComplete;

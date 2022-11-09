@@ -22,10 +22,16 @@ public class OrderMatching implements Runnable {
     public OrderMatching(List<Order> orderList) {
         this.orderList = orderList;
         this.orderExchaneData();
+        run3();
     }
 
     @Override
     public void run() {
+
+    }
+
+    //@Override
+    public void run3() {
 
         for (Order order : this.orderList) {
             if (OrderMatching.mapSellOrder.containsKey(order.getStockName()) && OrderMatching.mapBuyOrder.containsKey(order.getStockName())) {
@@ -67,6 +73,18 @@ public class OrderMatching implements Runnable {
             }
         }
     }
+
+    /**
+     * (format:<sell-order-id> <qty> <sell-price> <buy-order-id>):
+     * #2 80 237.45 #3
+     * #2 10 237.45 #6
+     * #1 100 240.10 #9
+     * #8 20 240.10 #9
+     * #5 30 241.50 #9
+     *
+     * @param sellOrder
+     * @param buyOrder
+     */
 
     private void prepareResponse(Order sellOrder, Order buyOrder) {
         OrderResponse loc = new OrderResponse();

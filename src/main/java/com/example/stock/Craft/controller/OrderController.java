@@ -1,6 +1,7 @@
 package com.example.stock.Craft.controller;
 
 import com.example.stock.Craft.dto.OrderDto;
+import com.example.stock.Craft.dto.OrderResponse;
 import com.example.stock.Craft.service.OrderService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -18,8 +19,8 @@ public class OrderController {
     private OrderService orderService;
 
     @PostMapping(value = "/order", consumes = "application/json", produces = "application/json")
-    public ResponseEntity<List<OrderDto>> createOrder(@RequestHeader("Authorization") String auth,
-                                                      @RequestBody List<OrderDto> orderDtoList) {
+    public ResponseEntity<List<OrderResponse>> createOrder(@RequestHeader("Authorization") String auth,
+                                                           @RequestBody List<OrderDto> orderDtoList) {
 
         return ResponseEntity.ok(orderService.createOrder(auth, orderDtoList));
 
