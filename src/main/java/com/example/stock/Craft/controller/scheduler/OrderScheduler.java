@@ -1,6 +1,7 @@
 package com.example.stock.Craft.controller.scheduler;
 
 import com.example.stock.Craft.repository.OrderServiceRepository;
+import com.example.stock.Craft.service.OrderMatching;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -18,6 +19,8 @@ public class OrderScheduler {
     public void schedulerForOrderCleaning() {
 
         // clean all data which order is not completed
+        //this.orderServiceRepository.
+        OrderMatching.cleanStockWorkBook();
 
     }
 }

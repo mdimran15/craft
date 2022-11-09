@@ -1,10 +1,12 @@
 package com.example.stock.Craft.service;
 
 import com.example.stock.Craft.dto.BuyOrderPriority;
+import com.example.stock.Craft.dto.OrderResponse;
 import com.example.stock.Craft.dto.OrderType;
 import com.example.stock.Craft.dto.SellOrderPriority;
 import com.example.stock.Craft.entity.Order;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.PriorityQueue;
 import java.util.Queue;
@@ -15,7 +17,7 @@ public class OrderMatching implements Runnable {
     private static ConcurrentHashMap<String, Queue<Order>> mapSellOrder = new ConcurrentHashMap<>();
     private static ConcurrentHashMap<String, Queue<Order>> mapBuyOrder = new ConcurrentHashMap<>();
     private List<Order> orderList;
-    private List<Order> responseOrderList;
+    private List<OrderResponse> responseOrderList;
 
     public OrderMatching(List<Order> orderList) {
         this.orderList = orderList;
@@ -36,12 +38,45 @@ public class OrderMatching implements Runnable {
     private void mapOrder(Queue<Order> sellOrders, Queue<Order> buyOrders) {
 
         if (sellOrders.isEmpty() || buyOrders.isEmpty()) return;
+        Order sellOrder = sellOrders.poll();
+        Order buyOrder = buyOrders.poll();
+        int sellQuantity = sellOrder.getQuantity();
+        int buyQuantity = buyOrder.getQuantity();
+        while (!sellOrders.isEmpty() && !buyOrders.isEmpty()) {
 
-        Order sellOrder = sellOrders.peek();
-        Order buyOrder = buyOrders.peek();
-        if(buyOrder.getPrice().compareTo(sellOrder.getPrice()) >= 0){
+            if (buyOrder.getPrice().compareTo(sellOrder.getPrice()) >= 0) {
 
+                if (sellQuantity > buyQuantity) {
+                    prepareResponse(sellOrder, buyOrder);
+                    // update table for buyorder completed
+                    sellQuantity = sellQuantity - buyQuantity;
+                    buyOrder = buyOrders.poll();
+                } else if (sellQuantity < buyQuantity) {
+                    prepareResponse(sellOrder, buyOrder);
+                    // update table for sellorder completed
+                    buyQuantity = buyQuantity - sellQuantity;
+                    sellOrder = sellOrders.poll();
+                } else {
+                    prepareResponse(sellOrder, buyOrder);
+                    // update table for buyorder and sellorder completed
+                    buyQuantity = sellQuantity = 0;
+                    sellOrder = sellOrders.poll();
+                    buyOrder = buyOrders.poll();
+                }
+
+            }
         }
+    }
+
+    private void prepareResponse(Order sellOrder, Order buyOrder) {
+        OrderResponse loc = new OrderResponse();
+        loc.setSellOrderId(sellOrder.getOrderId());
+        loc.setQuantity(buyOrder.getQuantity());
+        loc.setPrice(sellOrder.getPrice());
+        loc.setBuyOrderId(buyOrder.getOrderId());
+        responseOrderList = new ArrayList<>();
+        responseOrderList.add(loc);
+
     }
 
     private void orderExchaneData() {
@@ -79,7 +114,12 @@ public class OrderMatching implements Runnable {
         }
     }
 
-    public List<Order> getResponseOrderList() {
+    public List<OrderResponse> getResponseOrderList() {
         return responseOrderList;
+    }
+
+    public static void cleanStockWorkBook() {
+        OrderMatching.mapSellOrder.clear();
+        OrderMatching.mapBuyOrder.clear();
     }
 }
